@@ -1,0 +1,6 @@
+node_modules/
+.env
+.netlify/
+backend/
+test-function.html
+*.log

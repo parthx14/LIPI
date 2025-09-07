@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LIPI — Script Generator</title>
+  <style>
+    body { font-family: system-ui, Arial; padding: 24px; max-width: 800px; margin: auto; }
+    textarea { width:100%; height:120px; font-size:14px; padding:8px; }
+    button { padding:10px 14px; font-size:16px; margin-top:8px; }
+    pre { background:#f7f7f7; padding:12px; border-radius:6px; white-space:pre-wrap; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+  <h1>Generate Script</h1>
+
+  <label for="prompt">Prompt</label>
+  <textarea id="prompt" placeholder="Describe the script you want...">Write a short script about interior design for Instagram Reels</textarea>
+
+  <br/>
+  <button id="generateBtn">Generate</button>
+  <span id="status" class="hidden">Generating…</span>
+
+  <h2>Result</h2>
+  <pre id="output">No output yet.</pre>
+
+  <script>
+  const btn = document.getElementById('generateBtn');
+  const out = document.getElementById('output');
+  const promptEl = document.getElementById('prompt');
+  const statusEl = document.getElementById('status');
+
+  btn.addEventListener('click', async () => {
+    const prompt = promptEl.value.trim();
+    if (!prompt) return alert('Please enter a prompt.');
+
+    btn.disabled = true;
+    statusEl.classList.remove('hidden');
+    statusEl.textContent = 'Generating…';
+    out.textContent = '';
+
+    try {
+      const res = await fetch('/.netlify/functions/generate-script', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+
+      // If the function returns a JSON body:
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        // handle HTTP errors (405, 500...)
+        const message = data?.error || data?.message || `HTTP ${res.status} ${res.statusText}`;
+        out.textContent = `Error: ${message}`;
+      } else {
+        // success — adapt to whatever your function returns
+        // assume { success: true, script: "..." }
+        if (data?.success) {
+          out.textContent = data.script ?? JSON.stringify(data, null, 2);
+        } else {
+          out.textContent = JSON.stringify(data, null, 2);
+        }
+      }
+    } catch (err) {
+      out.textContent = 'Network or parsing error:\n' + err.message;
+    } finally {
+      btn.disabled = false;
+      statusEl.classList.add('hidden');
+    }
+  });
+  </script>
+</body>
+</html>
