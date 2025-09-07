@@ -1,75 +1,769 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>LIPI — Script Generator</title>
-  <style>
-    body { font-family: system-ui, Arial; padding: 24px; max-width: 800px; margin: auto; }
-    textarea { width:100%; height:120px; font-size:14px; padding:8px; }
-    button { padding:10px 14px; font-size:16px; margin-top:8px; }
-    pre { background:#f7f7f7; padding:12px; border-radius:6px; white-space:pre-wrap; }
-    .hidden { display:none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIPI - Script Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --gray-1: #f5f5f5;
+            --gray-2: #e0e0e0;
+            --gray-3: #9e9e9e;
+            --gray-4: #424242;
+            --bg-color: var(--white);
+            --text-color: var(--black);
+            --card-bg: var(--white);
+            --border-color: var(--gray-2);
+            --footer-bg: var(--black);
+            --footer-text: var(--white);
+            --feature-bg: var(--gray-1);
+        }
+        
+        .dark-mode {
+            --black: #000000;
+            --white: #ffffff;
+            --gray-1: #1a1a1a;
+            --gray-2: #2a2a2a;
+            --gray-3: #646464;
+            --gray-4: #9e9e9e;
+            --bg-color: #121212;
+            --text-color: var(--white);
+            --card-bg: #1a1a1a;
+            --border-color: #2a2a2a;
+            --footer-bg: #000000;
+            --footer-text: var(--white);
+            --feature-bg: #0a0a0a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            padding: 25px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .header-scrolled {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .dark-mode .header-scrolled {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            letter-spacing: -0.5px;
+        }
+        
+        .logo span {
+            font-weight: 400;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+        }
+        
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        nav a:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--text-color);
+            transition: width 0.3s;
+        }
+        
+        nav a:hover:after {
+            width: 100%;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 20px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--border-color);
+        }
+        
+        .cta-button {
+            background: var(--text-color);
+            color: var(--bg-color);
+            border: 1px solid var(--text-color);
+            padding: 12px 28px;
+            border-radius: 2px;
+            font-weight: 500;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+        }
+        
+        .cta-button:hover {
+            background: transparent;
+            color: var(--text-color);
+        }
+        
+        /* Generator Section */
+        .generator {
+            padding: 180px 0 100px;
+        }
+        
+        .generator-container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 80px;
+            align-items: start;
+        }
+        
+        .generator-content h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 64px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+        }
+        
+        .generator-content p {
+            font-size: 18px;
+            color: var(--gray-4);
+            margin-bottom: 40px;
+            line-height: 1.7;
+            max-width: 500px;
+            font-weight: 400;
+        }
+        
+        .divider {
+            width: 80px;
+            height: 2px;
+            background: var(--text-color);
+            margin: 30px 0;
+        }
+        
+        .generator-form {
+            background: var(--card-bg);
+            border-radius: 2px;
+            padding: 50px 40px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+        
+        .dark-mode .generator-form {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 500;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray-4);
+        }
+        
+        .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 2px;
+            color: var(--text-color);
+            font-size: 16px;
+            transition: all 0.3s;
+            appearance: none;
+        }
+        
+        .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--text-color);
+        }
+        
+        .form-group textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+        
+        .select-wrapper {
+            position: relative;
+        }
+        
+        .select-wrapper:after {
+            content: "▼";
+            font-size: 12px;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--text-color);
+        }
+
+        /* Modal Styles */
+        .script-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 8px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 40px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: var(--gray-4);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .modal-body {
+            padding: 30px 40px;
+        }
+
+        .script-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: var(--feature-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .script-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+            color: var(--text-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .script-section p {
+            margin: 0;
+            line-height: 1.7;
+            color: var(--text-color);
+            white-space: pre-wrap;
+            font-size: 16px;
+        }
+
+        .script-metadata {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .script-metadata p {
+            margin: 8px 0;
+            color: var(--gray-4);
+            font-size: 14px;
+        }
+
+        .script-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .script-actions button {
+            background: var(--text-color);
+            color: var(--bg-color);
+            border: 1px solid var(--text-color);
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+        }
+
+        .script-actions button:hover {
+            background: transparent;
+            color: var(--text-color);
+        }
+
+        /* Loading state for generate button */
+        .cta-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1100px) {
+            .generator-content h1 {
+                font-size: 54px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .generator-container {
+                grid-template-columns: 1fr;
+                gap: 60px;
+            }
+            
+            .generator-content h1 {
+                font-size: 48px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .generator-content h1 {
+                font-size: 40px;
+            }
+            
+            nav {
+                display: none;
+            }
+            
+            .generator-form {
+                padding: 30px 25px;
+            }
+            
+            .modal-content {
+                margin: 10px;
+                max-height: 95vh;
+            }
+            
+            .modal-header,
+            .modal-body {
+                padding: 20px 25px;
+            }
+            
+            .modal-header h2 {
+                font-size: 24px;
+            }
+            
+            .script-section {
+                padding: 20px;
+            }
+            
+            .script-actions {
+                flex-direction: column;
+            }
+            
+            .script-actions button {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .generator-content h1 {
+                font-size: 36px;
+            }
+            
+            .generator-content p {
+                font-size: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Generate Script</h1>
+    <!-- Header -->
+    <header id="header">
+        <div class="container header-content">
+            <a href="#" class="logo">LIPI<span>.</span></a>
+            <nav>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#examples">Examples</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
 
-  <label for="prompt">Prompt</label>
-  <textarea id="prompt" placeholder="Describe the script you want...">Write a short script about interior design for Instagram Reels</textarea>
+    <!-- Generator Section -->
+    <section class="generator">
+        <div class="container generator-container">
+            <div class="generator-content fade-in">
+                <h1>Craft compelling scripts with precision</h1>
+                <p>LIPI helps creators overcome writer's block and generate engaging video scripts with elegant efficiency. No distractions, just powerful writing tools.</p>
+                <div class="divider"></div>
+                <p>Trusted by content creators at leading studios and production companies worldwide.</p>
+            </div>
+            <div class="generator-form fade-in">
+                <h2 class="form-title">Generate Your Script</h2>
+                <div class="form-group">
+                    <label for="script-type">Script Type</label>
+                    <div class="select-wrapper">
+                        <select id="script-type">
+                            <option>YouTube Video</option>
+                            <option>TikTok/Reels</option>
+                            <option>Instagram Story</option>
+                            <option>Advertisement</option>
+                            <option>Educational Explainer</option>
+                            <option>Business Presentation</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="tone">Tone & Style</label>
+                    <div class="select-wrapper">
+                        <select id="tone">
+                            <option>Conversational</option>
+                            <option>Professional</option>
+                            <option>Witty</option>
+                            <option>Inspirational</option>
+                            <option>Storytelling</option>
+                            <option>Persuasive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="duration">Duration</label>
+                    <div class="select-wrapper">
+                        <select id="duration">
+                            <option value="30-seconds">30 seconds</option>
+                            <option value="1-minute">1 minute</option>
+                            <option value="2-minutes">2 minutes</option>
+                            <option value="5-minutes">5 minutes</option>
+                            <option value="10-minutes">10 minutes</option>
+                            <option value="15-minutes">15 minutes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="language">Script Language</label>
+                    <div class="select-wrapper">
+                        <select id="language">
+                            <option value="english">English</option>
+                            <option value="spanish">Spanish (Español)</option>
+                            <option value="french">French (Français)</option>
+                            <option value="hindi">Hindi (हिन्दी)</option>
+                            <option value="urdu">Urdu (اردو)</option>
+                            <option value="bengali">Bengali (বাংলা)</option>
+                            <option value="tamil">Tamil (தமிழ்)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="topic">Topic/Keywords</label>
+                    <textarea id="topic" placeholder="Describe your video topic or enter keywords..."></textarea>
+                </div>
+                <button class="cta-button" style="width: 100%;">Generate Script</button>
+            </div>
+        </div>
+    </section>
 
-  <br/>
-  <button id="generateBtn">Generate</button>
-  <span id="status" class="hidden">Generating…</span>
-
-  <h2>Result</h2>
-  <pre id="output">No output yet.</pre>
-
-  <script>
-  const btn = document.getElementById('generateBtn');
-  const out = document.getElementById('output');
-  const promptEl = document.getElementById('prompt');
-  const statusEl = document.getElementById('status');
-
-  btn.addEventListener('click', async () => {
-    const prompt = promptEl.value.trim();
-    if (!prompt) return alert('Please enter a prompt.');
-
-    btn.disabled = true;
-    statusEl.classList.remove('hidden');
-    statusEl.textContent = 'Generating…';
-    out.textContent = '';
-
-    try {
-      const res = await fetch('/.netlify/functions/generate-script', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-      });
-
-      // If the function returns a JSON body:
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        // handle HTTP errors (405, 500...)
-        const message = data?.error || data?.message || `HTTP ${res.status} ${res.statusText}`;
-        out.textContent = `Error: ${message}`;
-      } else {
-        // success — adapt to whatever your function returns
-        // assume { success: true, script: "..." }
-        if (data?.success) {
-          out.textContent = data.script ?? JSON.stringify(data, null, 2);
-        } else {
-          out.textContent = JSON.stringify(data, null, 2);
+    <script>
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+        });
+        
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        // Check for saved theme preference or respect OS preference
+        if (localStorage.getItem('theme') === 'dark' || 
+            (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme'))) {
+            document.body.classList.add('dark-mode');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
         }
-      }
-    } catch (err) {
-      out.textContent = 'Network or parsing error:\n' + err.message;
-    } finally {
-      btn.disabled = false;
-      statusEl.classList.add('hidden');
-    }
-  });
-  </script>
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+
+        // Form submission with backend integration
+        const generateButton = document.querySelector('.generator-form .cta-button');
+        generateButton.addEventListener('click', async function() {
+            const scriptType = document.getElementById('script-type').value;
+            const tone = document.getElementById('tone').value;
+            const duration = document.getElementById('duration').value;
+            const language = document.getElementById('language').value;
+            const topic = document.getElementById('topic').value;
+            
+            if (topic.trim() === '') {
+                alert('Please enter a topic or keywords for your script.');
+                return;
+            }
+            
+            // Show loading state
+            const originalText = generateButton.textContent;
+            generateButton.textContent = 'Generating Script...';
+            generateButton.disabled = true;
+            
+            try {
+                const response = await fetch('/.netlify/functions/generate-script', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        scriptType: scriptType,
+                        tone: tone,
+                        duration: duration,
+                        language: language,
+                        topic: topic
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showScriptResult(data);
+                } else {
+                    throw new Error(data.error || 'Failed to generate script');
+                }
+                
+            } catch (error) {
+                console.error('Script generation error:', error);
+                alert(`Failed to generate script: ${error.message}`);
+            } finally {
+                // Reset button state
+                generateButton.textContent = originalText;
+                generateButton.disabled = false;
+            }
+        });
+        
+        // Function to display script results
+        function showScriptResult(data) {
+            // Parse the script content
+            const scriptParts = data.script.split('\n\n');
+            const hook = scriptParts[0] || '';
+            const mainContent = scriptParts[1] || '';
+            const callToAction = scriptParts[2] || '';
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'script-modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Your Generated Script</h2>
+                        <button class="close-modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="script-section">
+                            <h3>Hook</h3>
+                            <p>${hook}</p>
+                        </div>
+                        <div class="script-section">
+                            <h3>Main Content</h3>
+                            <p>${mainContent}</p>
+                        </div>
+                        <div class="script-section">
+                            <h3>Call to Action</h3>
+                            <p>${callToAction}</p>
+                        </div>
+                        <div class="script-metadata">
+                            <p><strong>Word Count:</strong> ${data.metadata?.wordCount || 'N/A'}</p>
+                            <p><strong>Estimated Duration:</strong> ${data.metadata?.estimatedDuration || 'N/A'}</p>
+                        </div>
+                        <div class="script-actions">
+                            <button class="copy-script">Copy Full Script</button>
+                            <button class="download-script">Download Script</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Add event listeners
+            modal.querySelector('.close-modal').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+            
+            modal.querySelector('.copy-script').addEventListener('click', () => {
+                navigator.clipboard.writeText(data.script);
+                alert('Script copied to clipboard!');
+            });
+            
+            modal.querySelector('.download-script').addEventListener('click', () => {
+                downloadScript(data);
+            });
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+        }
+        
+        // Function to download script as text file
+        function downloadScript(data) {
+            const content = `LIPI Generated Script
+Generated: ${data.timestamp}
+
+${data.script}
+
+---
+Metadata:
+- Word Count: ${data.metadata?.wordCount}
+- Estimated Duration: ${data.metadata?.estimatedDuration}`;
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lipi-script-${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
 </body>
 </html>
