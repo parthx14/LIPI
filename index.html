@@ -884,12 +884,28 @@
                     <div class="select-wrapper">
                         <select id="language">
                             <option value="english">English</option>
+                            <option value="hindi">Hindi (हिन्दी)</option>
                             <option value="spanish">Spanish (Español)</option>
                             <option value="french">French (Français)</option>
-                            <option value="hindi">Hindi (हिन्दी)</option>
-                            <option value="urdu">Urdu (اردو)</option>
+                            <option value="chinese">Chinese (中文)</option>
+                            <option value="arabic">Arabic (العربية)</option>
+                            <option value="portuguese">Portuguese (Português)</option>
+                            <option value="russian">Russian (Русский)</option>
+                            <option value="japanese">Japanese (日本語)</option>
+                            <option value="korean">Korean (한국어)</option>
+                            <option value="german">German (Deutsch)</option>
+                            <option value="italian">Italian (Italiano)</option>
                             <option value="bengali">Bengali (বাংলা)</option>
                             <option value="tamil">Tamil (தமிழ்)</option>
+                            <option value="telugu">Telugu (తెలుగు)</option>
+                            <option value="marathi">Marathi (मराठी)</option>
+                            <option value="gujarati">Gujarati (ગુજરાતી)</option>
+                            <option value="punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
+                            <option value="malayalam">Malayalam (മലയാളം)</option>
+                            <option value="kannada">Kannada (ಕನ್ನಡ)</option>
+                            <option value="urdu">Urdu (اردو)</option>
+                            <option value="nepali">Nepali (नेपाली)</option>
+                            <option value="sinhala">Sinhala (සිංහල)</option>
                         </select>
                     </div>
                 </div>
@@ -1184,7 +1200,77 @@
                 element.style.transition = 'opacity 0.8s ease';
                 fadeObserver.observe(element);
             });
+            
+            // Initialize duration options based on script type
+            updateDurationOptions();
         });
+        
+        // Duration options based on script type
+        const durationOptions = {
+            'YouTube Video': [
+                { value: '2-minutes', text: '2 minutes' },
+                { value: '5-minutes', text: '5 minutes' },
+                { value: '10-minutes', text: '10 minutes' },
+                { value: '15-minutes', text: '15 minutes' },
+                { value: '20-minutes', text: '20 minutes' }
+            ],
+            'TikTok/Reels': [
+                { value: '15-seconds', text: '15 seconds' },
+                { value: '30-seconds', text: '30 seconds' },
+                { value: '60-seconds', text: '60 seconds' },
+                { value: '90-seconds', text: '90 seconds' }
+            ],
+            'Instagram Story': [
+                { value: '15-seconds', text: '15 seconds' },
+                { value: '30-seconds', text: '30 seconds' },
+                { value: '60-seconds', text: '60 seconds' }
+            ],
+            'Advertisement': [
+                { value: '15-seconds', text: '15 seconds' },
+                { value: '30-seconds', text: '30 seconds' },
+                { value: '60-seconds', text: '60 seconds' },
+                { value: '2-minutes', text: '2 minutes' }
+            ],
+            'Educational Explainer': [
+                { value: '3-minutes', text: '3 minutes' },
+                { value: '5-minutes', text: '5 minutes' },
+                { value: '10-minutes', text: '10 minutes' },
+                { value: '15-minutes', text: '15 minutes' },
+                { value: '20-minutes', text: '20 minutes' }
+            ],
+            'Business Presentation': [
+                { value: '5-minutes', text: '5 minutes' },
+                { value: '10-minutes', text: '10 minutes' },
+                { value: '15-minutes', text: '15 minutes' },
+                { value: '20-minutes', text: '20 minutes' },
+                { value: '30-minutes', text: '30 minutes' }
+            ]
+        };
+        
+        // Update duration dropdown based on script type
+        function updateDurationOptions() {
+            const scriptTypeSelect = document.getElementById('script-type');
+            const durationSelect = document.getElementById('duration');
+            
+            scriptTypeSelect.addEventListener('change', function() {
+                const selectedType = this.value;
+                const options = durationOptions[selectedType] || durationOptions['YouTube Video'];
+                
+                // Clear existing options
+                durationSelect.innerHTML = '';
+                
+                // Add new options
+                options.forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option.value;
+                    optionElement.textContent = option.text;
+                    durationSelect.appendChild(optionElement);
+                });
+            });
+            
+            // Trigger initial update
+            scriptTypeSelect.dispatchEvent(new Event('change'));
+        }
 
         // Form submission with backend integration
         const generateButton = document.querySelector('.generator-form .cta-button');
