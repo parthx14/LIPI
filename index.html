@@ -421,6 +421,262 @@
             cursor: not-allowed;
         }
 
+        /* Features Section */
+        .features {
+            padding: 120px 0;
+            background: var(--feature-bg);
+        }
+        
+        .section-title {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: 18px;
+            color: var(--gray-4);
+            max-width: 600px;
+            margin: 0 auto 80px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: 2px;
+            padding: 40px 30px;
+            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+        }
+        
+        .dark-mode .feature-card:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--text-color);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            font-size: 22px;
+            color: var(--bg-color);
+        }
+        
+        .feature-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .feature-card p {
+            color: var(--gray-4);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        /* Examples Section Styles */
+        .examples {
+            padding: 120px 0;
+            background: var(--bg-color);
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .example-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-mode .example-card {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .example-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .example-card:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .example-header {
+            background: var(--feature-bg);
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .example-type {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-color);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .example-tone {
+            background: var(--text-color);
+            color: var(--bg-color);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .example-topic {
+            padding: 20px 25px 15px;
+            font-weight: 500;
+            color: var(--gray-4);
+            font-size: 14px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .example-content {
+            padding: 25px;
+        }
+
+        .example-section {
+            margin-bottom: 25px;
+        }
+
+        .example-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .example-section h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .example-section p {
+            color: var(--gray-4);
+            line-height: 1.6;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        /* Footer */
+        footer {
+            padding: 80px 0 40px;
+            background: var(--footer-bg);
+            color: var(--footer-text);
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            margin-bottom: 60px;
+        }
+        
+        .footer-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: inline-block;
+            color: var(--footer-text);
+        }
+        
+        .footer-about {
+            font-size: 16px;
+            color: var(--gray-3);
+            line-height: 1.7;
+            max-width: 400px;
+        }
+        
+        .footer-links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+        
+        .footer-column h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-column a {
+            color: var(--gray-3);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 15px;
+        }
+        
+        .footer-column a:hover {
+            color: var(--footer-text);
+        }
+        
+        .copyright {
+            color: var(--gray-3);
+            font-size: 14px;
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--gray-4);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 1s ease forwards;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
         /* Responsive Design */
         @media (max-width: 1100px) {
             .generator-content h1 {
@@ -436,6 +692,16 @@
             
             .generator-content h1 {
                 font-size: 48px;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+
+            .examples-grid {
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                gap: 25px;
             }
         }
         
@@ -477,6 +743,52 @@
             .script-actions button {
                 width: 100%;
             }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-links {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .examples {
+                padding: 80px 0;
+            }
+            
+            .examples-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                margin-top: 40px;
+            }
+            
+            .example-card {
+                margin: 0 10px;
+            }
+            
+            .example-header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .example-content {
+                padding: 20px;
+            }
+            
+            .example-section h4 {
+                font-size: 14px;
+            }
+            
+            .example-section p {
+                font-size: 13px;
+            }
+
+            .section-title {
+                font-size: 36px;
+            }
         }
         
         @media (max-width: 576px) {
@@ -485,6 +797,14 @@
             }
             
             .generator-content p {
+                font-size: 16px;
+            }
+
+            .section-title {
+                font-size: 32px;
+            }
+            
+            .section-subtitle {
                 font-size: 16px;
             }
         }
@@ -582,6 +902,233 @@
         </div>
     </section>
 
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Powerful Features</h2>
+            <p class="section-subtitle">Designed to help you create compelling content with minimal effort and maximum impact.</p>
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-film"></i>
+                    </div>
+                    <h3>Multiple Script Types</h3>
+                    <p>Create scripts for social media, YouTube videos, ads, educational content, presentations, and more.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-fish"></i>
+                    </div>
+                    <h3>Attention-Grabbing Hooks</h3>
+                    <p>Generate strong opening lines that capture your audience's attention within the first few seconds.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3>Structured Flow</h3>
+                    <p>Organized scripts with clear beginning, middle, and end sections for optimal storytelling.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <h3>Tone & Style Options</h3>
+                    <p>Choose from various tones like witty, professional, inspirational, casual, or persuasive.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Audience Targeting</h3>
+                    <p>Tailor your script language and delivery style based on your specific audience demographics.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <h3>Call-to-Action Lines</h3>
+                    <p>Include effective CTAs to drive engagement, subscriptions, follows, or purchases.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Examples Section -->
+    <section class="examples" id="examples">
+        <div class="container">
+            <h2 class="section-title">Script Examples</h2>
+            <p class="section-subtitle">See how LIPI generates compelling scripts for different platforms and tones.</p>
+            
+            <div class="examples-grid">
+                <div class="example-card fade-in">
+                    <div class="example-header">
+                        <div class="example-type">YouTube Video</div>
+                        <div class="example-tone">Conversational</div>
+                    </div>
+                    <div class="example-topic">Topic: "Starting a Morning Routine"</div>
+                    <div class="example-content">
+                        <div class="example-section">
+                            <h4>Hook</h4>
+                            <p>"What if I told you that the first 30 minutes of your day could completely transform your life? Stick around because I'm about to share the morning routine that changed everything for me."</p>
+                        </div>
+                        <div class="example-section">
+                            <h4>Main Content</h4>
+                            <p>"Most people wake up and immediately check their phones, but that's setting yourself up for a reactive day. Instead, here's what successful people do differently..."</p>
+                        </div>
+                        <div class="example-section">
+                            <h4>Call to Action</h4>
+                            <p>"If this helped you design your perfect morning routine, smash that like button and subscribe for more productivity tips!"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example-card fade-in">
+                    <div class="example-header">
+                        <div class="example-type">TikTok/Reels</div>
+                        <div class="example-tone">Witty</div>
+                    </div>
+                    <div class="example-topic">Topic: "Productivity Hacks"</div>
+                    <div class="example-content">
+                        <div class="example-section">
+                            <h4>Hook</h4>
+                            <p>"POV: You just discovered the productivity hack that makes you look like you have your life together (but you're still a mess inside)"</p>
+                        </div>
+                        <div class="example-section">
+                            <h4>Solution</h4>
+                            <p>"It's called the 2-minute rule: If it takes less than 2 minutes, do it NOW. Your future self will thank you when you're not drowning in tiny tasks."</p>
+                        </div>
+                        <div class="example-section">
+                            <h4>CTA</h4>
+                            <p>"Follow for more life hacks that actually work! What productivity tip should I cover next?"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example-card fade-in">
+                    <div class="example-header">
+                        <div class="example-type">Advertisement</div>
+                        <div class="example-tone">Persuasive</div>
+                    </div>
+                    <div class="example-topic">Topic: "Online Course Platform"</div>
+                    <div class="example-content">
+                        <div class="example-section">
+                            <h4>Problem</h4>
+                            <p>"Tired of spending thousands on courses that promise the world but deliver nothing? You're not alone."</p>
+                        </div>
+                        <div class="example-section">
+                            <h4>Solution</h4>
+                            <p>"That's why we created LearnSmart - the only platform that guarantees results or your money back. Real skills, real results, real fast."</p>
+                        </div>
+                        <div class="example-section">
+                            <h4>CTA</h4>
+                            <p>"Join over 50,000 students who've already transformed their careers. Limited time: 50% off your first month!"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example-card fade-in">
+                    <div class="example-header">
+                        <div class="example-type">Educational</div>
+                        <div class="example-tone">Professional</div>
+                    </div>
+                    <div class="example-topic">Topic: "Climate Change Basics"</div>
+                    <div class="example-content">
+                        <div class="example-section">
+                            <h4>Introduction</h4>
+                            <p>"Climate change is one of the most pressing issues of our time. Today, we'll examine the scientific evidence and understand the mechanisms driving global temperature rise."</p>
+                        </div>
+                        <div class="example-section">
+                            <h4>Explanation</h4>
+                            <p>"The greenhouse effect occurs when certain gases in our atmosphere trap heat from the sun. While this is natural, human activities have dramatically increased these gases..."</p>
+                        </div>
+                        <div class="example-section">
+                            <h4>Conclusion</h4>
+                            <p>"Understanding these fundamentals is crucial for making informed decisions about our planet's future."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example-card fade-in">
+                    <div class="example-header">
+                        <div class="example-type">Instagram Story</div>
+                        <div class="example-tone">Inspirational</div>
+                    </div>
+                    <div class="example-topic">Topic: "Overcoming Fear"</div>
+                    <div class="example-content">
+                        <div class="example-section">
+                            <h4>Hook</h4>
+                            <p>"The thing that scared me most became my biggest breakthrough ✨"</p>
+                        </div>
+                        <div class="example-section">
+                            <h4>Story</h4>
+                            <p>"I used to be terrified of public speaking. Now I speak to thousands. The secret? I stopped trying to eliminate fear and started dancing with it instead."</p>
+                        </div>
+                        <div class="example-section">
+                            <h4>CTA</h4>
+                            <p>"What fear is holding YOU back? DM me and let's turn it into your superpower! 💪"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example-card fade-in">
+                    <div class="example-header">
+                        <div class="example-type">Business Presentation</div>
+                        <div class="example-tone">Strategic</div>
+                    </div>
+                    <div class="example-topic">Topic: "Q4 Marketing Strategy"</div>
+                    <div class="example-content">
+                        <div class="example-section">
+                            <h4>Opening</h4>
+                            <p>"Good morning, team. Today we'll review our Q3 performance and outline our strategic approach for Q4 to exceed our annual targets."</p>
+                        </div>
+                        <div class="example-section">
+                            <h4>Analysis</h4>
+                            <p>"Our data shows a 23% increase in engagement, but conversion rates have plateaued. This presents a clear opportunity for optimization..."</p>
+                        </div>
+                        <div class="example-section">
+                            <h4>Next Steps</h4>
+                            <p>"I'll be scheduling individual meetings with each department head to finalize implementation timelines."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <a href="#" class="footer-logo">LIPI</a>
+                    <p class="footer-about">LIPI is an advanced script generation tool designed to help content creators overcome writer's block and produce engaging video scripts with elegance and efficiency.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <ul>
+                            <li><a href="#">Features</a></li>
+                            <li><a href="#">Examples</a></li>
+                            <li><a href="#">Pricing</a></li>
+                            <li><a href="#">API</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="#">About</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Careers</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p class="copyright">© 2023 LIPI Script Generator. All rights reserved.</p>
+        </div>
+    </footer>
+
     <script>
         // Header scroll effect
         window.addEventListener('scroll', function() {
@@ -617,6 +1164,26 @@
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
             }
+        });
+        
+        // Animation on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            
+            const fadeObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        fadeObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            fadeElements.forEach(element => {
+                element.style.opacity = 0;
+                element.style.transition = 'opacity 0.8s ease';
+                fadeObserver.observe(element);
+            });
         });
 
         // Form submission with backend integration
