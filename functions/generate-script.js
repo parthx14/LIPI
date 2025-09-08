@@ -371,20 +371,34 @@ function generateScript(scriptType, tone, topic, duration, language) {
   
   let mainContent = generateMainContent(scriptType, tone, topic, wordLimits, language);
 
+  const hookContent = (hooks[scriptType] && hooks[scriptType][tone]) ? hooks[scriptType][tone] : (hooks[scriptType] || hooks['YouTube Video']);
+  const ctaContent = ctas[scriptType] || ctas['YouTube Video'];
+  
+  const hookWords = hookContent.split(' ').length;
+  const mainWords = mainContent.split(' ').length;
+  const ctaWords = ctaContent.split(' ').length;
+  const totalWords = hookWords + mainWords + ctaWords;
+
   const script = {
     id: Date.now().toString(),
     type: scriptType,
     tone: tone,
     topic: topic,
     language: language,
+    duration: duration,
     content: {
-      hook: (hooks[scriptType] && hooks[scriptType][tone]) ? hooks[scriptType][tone] : (hooks[scriptType] || hooks['YouTube Video']),
+      hook: hookContent,
       mainContent: mainContent,
-      callToAction: ctas[scriptType] || ctas['YouTube Video']
+      callToAction: ctaContent
     },
     metadata: {
-      wordCount: mainContent.split(' ').length + 20,
+      wordCount: totalWords,
+      targetWords: wordLimits.target,
+      hookWords: hookWords,
+      mainWords: mainWords,
+      ctaWords: ctaWords,
       estimatedDuration: `${Math.ceil(durationInfo.totalSeconds / 60)} minutes`,
+      actualDurationSeconds: durationInfo.totalSeconds,
       generatedAt: new Date().toISOString()
     }
   };
@@ -393,69 +407,178 @@ function generateScript(scriptType, tone, topic, duration, language) {
 }
 
 function generateMainContent(scriptType, tone, topic, wordLimits, language) {
-  // Get language-specific content - ensure 100% native language content with proper duration scaling
-  return getCompletelyNativeContent(language, scriptType, tone, topic, wordLimits);
-}
-
-function getCompletelyNativeContent(language, scriptType, tone, topic, wordLimits) {
-  // Generate content that scales properly with duration - short durations get concise content, long durations get detailed content
-  return generateDurationScaledContent(language, scriptType, tone, topic, wordLimits);
-}
-
-function generateDurationScaledContent(language, scriptType, tone, topic, wordLimits) {
   const targetWords = wordLimits.target;
   
-  // Generate content based on actual target word count for proper duration scaling
-  const baseContent = getBaseContentForLanguage(language, scriptType, tone, topic);
+  // Determine content length based on target words (accounting for hook and CTA)
+  // Reserve approximately 20-30 words for hook and CTA combined
+  const mainContentTarget = Math.max(10, targetWords - 25);
   
-  // Scale content based on target words with TONE-SPECIFIC emotional content
-  if (targetWords <= 30) {
-    // Very short content (15-30 seconds)
-    return generateToneBasedContent(language, topic, tone, 'short', targetWords);
-  } else if (targetWords <= 80) {
-    // Short content (30 seconds - 1 minute)
-    return generateToneBasedContent(language, topic, tone, 'medium', targetWords);
-  } else if (targetWords <= 200) {
-    // Medium content (1-3 minutes)
-    return generateToneBasedContent(language, topic, tone, 'long', targetWords);
+  let contentLength;
+  if (mainContentTarget <= 20) {
+    contentLength = 'short';
+  } else if (mainContentTarget <= 60) {
+    contentLength = 'medium';
+  } else if (mainContentTarget <= 150) {
+    contentLength = 'long';
   } else {
-    // Long detailed content (3+ minutes)
-    return generateToneBasedContent(language, topic, tone, 'very_long', targetWords);
+    contentLength = 'very_long';
   }
+  
+  // Generate content in the selected language with proper tone and length
+  let content = generateContentByLanguageAndTone(language, topic, tone, contentLength, mainContentTarget);
+  
+  // If content is significantly shorter than target, expand it
+  const currentWords = content.split(' ').length;
+  if (currentWords < mainContentTarget * 0.7) {
+    content = expandContent(content, topic, tone, language, mainContentTarget);
+  }
+  
+  return content;
 }
 
-function generateToneBasedContent(language, topic, tone, length, targetWords) {
-  // Emotional and detailed content based on tone
-  const toneTemplates = {
+function generateContentByLanguageAndTone(language, topic, tone, length, targetWords) {
+  // Comprehensive multilingual content templates with all tones
+  const contentTemplates = {
     'hindi': {
       'Conversational': {
-        short: `दोस्तों, ${topic} के बारे में मैं आपको एक बात बताता हूं जो आपकी जिंदगी बदल देगी! 😊 यह इतना सरल है कि आप हैरान रह जाएंगे।`,
-        medium: `अरे यार, ${topic} को लेकर जो confusion है ना, वो मैं आज साफ कर देता हूं! 🤗 सच कहूं तो, मैंने भी पहले यही गलती की थी। लेकिन जब मुझे असली बात पता चली, तो मैं सोचता रहा - काश मुझे यह पहले पता होता! आइए इसे step by step समझते हैं।`,
-        long: `भाई, ${topic} की बात करें तो मेरा दिल भर आता है! 💝 क्यों? क्योंकि मैंने देखा है कि कैसे लोग इसमें struggle करते हैं, बिल्कुल वैसे ही जैसे मैं करता था। पहले मैं भी सोचता था कि यह बहुत complicated है, लेकिन सच्चाई यह है कि हम इसे जरूरत से ज्यादा मुश्किल बना देते हैं। आज मैं आपके साथ वो सारे secrets share करूंगा जो मैंने सालों की मेहनत से सीखे हैं।`,
-        very_long: `दोस्तों, आज मैं आपके साथ ${topic} की पूरी कहानी share करने जा रहा हूं! 🌟 यह journey emotional भी है और educational भी। मैं आपको बताऊंगा कि कैसे मैंने इस field में अपनी शुरुआत की, कैसे मैंने गलतियां कीं, कैसे मैंने सीखा, और कैसे आप भी इन सभी चुनौतियों से पार पा सकते हैं। यकीन मानिए, अगर मैं कर सकता हूं तो आप भी कर सकते हैं! चलिए शुरू करते हैं इस amazing journey को।`
+        short: `दोस्तों, ${topic} के बारे में एक बात बताता हूं! 😊 यह सरल trick आपकी जिंदगी बदल देगी।`,
+        medium: `अरे यार, ${topic} को लेकर confusion है? मैं आज साफ कर देता हूं! 🤗 सच कहूं तो, मैंने भी पहले यही गलती की थी। लेकिन जब असली बात पता चली, तो सब clear हो गया। आइए step by step समझते हैं।`,
+        long: `भाई, ${topic} की बात करें तो मेरा दिल भर आता है! 💝 मैंने देखा है कि कैसे लोग इसमें struggle करते हैं। पहले मैं भी सोचता था कि यह complicated है, लेकिन सच्चाई यह है कि हम इसे जरूरत से ज्यादा मुश्किल बना देते हैं। आज मैं वो सारे secrets share करूंगा जो मैंने सालों की मेहनत से सीखे हैं। पहली बात - foundation strong होना चाहिए। दूसरी बात - consistency सबसे important है।`,
+        very_long: `दोस्तों, आज मैं ${topic} की complete journey share करूंगा! 🌟 यह emotional भी है और educational भी। मैं बताऊंगा कि कैसे मैंने शुरुआत की, कैसे गलतियां कीं, कैसे सीखा, और कैसे आप भी सफल हो सकते हैं। यकीन मानिए, अगर मैं कर सकता हूं तो आप भी कर सकते हैं! पहले मैं बिल्कुल beginner था, कुछ नहीं जानता था। फिर धीरे-धीरे practice करके, mistakes से सीखकर, experts से guidance लेकर मैंने इसमें mastery हासिल की। आज मैं आपको वो सारी techniques बताऊंगा जो really काम करती हैं।`
       },
       'Professional': {
-        short: `${topic} के क्षेत्र में एक महत्वपूर्ण insight है जो industry leaders को अलग बनाती है। 💼 यह strategic approach आपके results को dramatically improve कर सकती है।`,
-        medium: `${topic} पर आज हम एक comprehensive analysis करेंगे। 📊 Market research से पता चलता है कि 80% professionals इस critical factor को overlook करते हैं। हमारे data-driven approach से आप समझ जाएंगे कि successful organizations क्यों इस methodology को prioritize करते हैं। यह approach आपकी productivity को 3x तक बढ़ा सकती है।`,
-        long: `${topic} के professional landscape में आज हम deep dive करेंगे। 🎯 Industry experts और thought leaders के साथ मेरी conversations से जो insights मिली हैं, वो आपके career trajectory को completely transform कर सकती हैं। हम discuss करेंगे कि कैसे Fortune 500 companies इन principles को implement करती हैं, कौन से metrics सबसे important हैं, और कैसे आप अपने organization में इन best practices को integrate कर सकते हैं।`,
-        very_long: `${topic} की professional mastery के लिए आज हम एक comprehensive framework develop करेंगे। 🏆 मेरे 10+ years के industry experience और leading experts के साथ collaboration से जो methodology emerge हुई है, वो आपको step-by-step guide करेगी। हम cover करेंगे: strategic planning, implementation roadmap, performance metrics, risk mitigation, stakeholder management, और long-term sustainability। यह complete blueprint आपको industry leader बनने में help करेगा।`
+        short: `${topic} के क्षेत्र में एक महत्वपूर्ण insight है। 💼 यह strategic approach आपके results को dramatically improve करेगी।`,
+        medium: `${topic} पर comprehensive analysis करते हैं। 📊 Research से पता चलता है कि 80% professionals इस critical factor को overlook करते हैं। हमारे data-driven approach से आप समझेंगे कि successful organizations क्यों इस methodology को prioritize करते हैं।`,
+        long: `${topic} के professional landscape में deep dive करते हैं। 🎯 Industry experts के साथ conversations से जो insights मिली हैं, वो आपके career को transform कर सकती हैं। हम discuss करेंगे कि Fortune 500 companies कैसे इन principles को implement करती हैं, कौन से metrics important हैं, और कैसे आप अपने organization में best practices integrate कर सकते हैं।`,
+        very_long: `${topic} की professional mastery के लिए comprehensive framework develop करते हैं। 🏆 मेरे 10+ years के experience और experts के collaboration से जो methodology emerge हुई है, वो step-by-step guide करेगी। हम cover करेंगे: strategic planning, implementation roadmap, performance metrics, risk mitigation, stakeholder management, और long-term sustainability। यह complete blueprint आपको industry leader बनाएगा। पहले हम foundation set करेंगे, फिर advanced strategies implement करेंगे।`
       },
       'Witty': {
-        short: `${topic} को समझना rocket science नहीं है, लेकिन लोग इसे brain surgery बना देते हैं! 😂 यहां है simple truth जो सबको पता होनी चाहिए।`,
-        medium: `अरे ${topic} की बात करें तो यह IKEA furniture जैसा है - instructions clear हैं लेकिन हम सब अपने आप को genius समझकर manual skip कर देते हैं! 🤣 फिर रोते हैं कि screws बचे हुए हैं। मैं आपको बताता हूं कि कैसे इस comedy of errors से बचा जाए और actually results पाए जाएं।`,
-        long: `${topic} के साथ हमारा relationship complicated है यार! 😅 यह वो ex की तरह है जिसे हम समझना चाहते हैं लेकिन हर बार confusion में पड़ जाते हैं। लेकिन good news यह है कि मैंने इस mystery को solve कर लिया है! आज मैं आपको बताऊंगा कि कैसे मैंने इस "it's complicated" status को "in a happy relationship" में convert किया। Trust me, यह journey hilarious भी है और enlightening भी!`,
-        very_long: `${topic} की पूरी comedy show आज आपके सामने present कर रहा हूं! 🎭 यह वो topic है जिसके साथ हम सबका love-hate relationship है। पहले प्यार, फिर breakup, फिर patch-up - यह cycle चलती रहती है। लेकिन आज मैं आपको बताऊंगा कि कैसे इस dramatic relationship को stable बनाया जाए। हम discuss करेंगे सारी funny mistakes, embarrassing moments, और उन aha moments को जो finally सब कुछ clear कर देते हैं। Get ready for entertainment with education!`
+        short: `${topic} rocket science नहीं है, लेकिन हम सब इसे brain surgery की तरह treat करते हैं! 😂 यहाँ है वो hilariously simple सच्चाई।`,
+        medium: `तो ${topic} basically IKEA furniture assemble करने जैसा है - instructions सामने हैं, लेकिन हम सब think करते हैं कि हम बहुत smart हैं पढ़ने के लिए! 🤣 फिर wonder करते हैं कि leftover screws क्यों हैं।`,
+        long: `${topic} के साथ हमारा relationship... complicated है! 😅 यह उस ex की तरह है जिसे हम समझने की कोशिश करते रहते हैं। लेकिन plot twist - मैंने finally code crack कर लिया है!`,
+        very_long: `Welcome to the ${topic} comedy show! 🎭 यह वो topic है जिसके साथ हम सबका love-hate relationship है। पहले love करते हैं, फिर hate करते हैं, फिर वापस काम करने की कोशिश करते हैं - यह dramatic soap opera जैसा है!`
+      },
+      'Inspirational': {
+        short: `${topic} आपके transformation का gateway है! ✨ यह single insight आपकी पूरी trajectory बदल सकती है।`,
+        medium: `${topic} के साथ आपकी journey आज शुरू होती है, और मैं यहाँ हूँ आपको बताने - आप incredible चीजों के capable हैं! 🌟 मैंने ordinary लोगों को extraordinary results achieve करते देखा है।`,
+        long: `आज आपकी ${topic} के through transformation की शुरुआत है! 🚀 मैं आपकी potential में believe करता हूँ क्योंकि मैंने human determination की incredible power witness की है। हर expert कभी beginner था।`,
+        very_long: `यह आपका ${topic} के साथ transformation का moment है! 🌈 मैं यह deep conviction के साथ share कर रहा हूँ क्योंकि मैंने lives change होते देखे हैं, dreams realize होते देखे हैं। आपकी success story यहाँ से शुरू होती है।`
+      },
+      'Storytelling': {
+        short: `मैं आपको ${topic} की एक story बताता हूँ जिसने सब कुछ बदल दिया... 📖 यह एक ऐसा moment था जिसने मेरा पूरा perspective shift कर दिया।`,
+        medium: `Picture this: रात के 2 बजे हैं, मैं computer screen पर stare कर रहा हूँ, ${topic} से completely frustrated। 😤 कुछ भी काम नहीं कर रहा था। फिर कुछ ऐसा हुआ जिसने सब कुछ बदल दिया।`,
+        long: `मैं आपको अपनी ${topic} journey के एक pivotal moment पर ले जाना चाहता हूँ। 🎬 यह उन दिनों में से एक था जब सब कुछ गलत लग रहा था। मैंने हर strategy try की थी, हर expert की advice follow की थी।`,
+        very_long: `Gather around, क्योंकि मैं अपनी ${topic} transformation की complete story share करने वाला हूँ - struggles, failures, breakthrough moments, और ultimate triumph। 📚 यह सिर्फ how-to guide नहीं है; यह human resilience की journey है।`
+      },
+      'Persuasive': {
+        short: `यहाँ है कि ${topic} आपकी success के लिए absolutely critical क्यों है right now! ⚡ Data undeniable है, और opportunity massive है।`,
+        medium: `मैं आपको prove करूँगा कि ${topic} सिर्फ important नहीं - यह आपकी future success के लिए essential है! 🔥 Statistics staggering हैं: जो लोग इसे master करते हैं वे 5x better results देखते हैं।`,
+        long: `मैं आपके सामने compelling case present करता हूँ कि ${topic} आपकी #1 priority क्यों होनी चाहिए right now! 💪 Evidence overwhelming है - इस field में हर successful person ने ये principles master किए हैं।`,
+        very_long: `मैं आपको ${topic} master करने के लिए सबसे compelling argument देने वाला हूँ! 🎯 Research clear है, results proven हैं, और opportunity unprecedented है। हम एक unique moment में जी रहे हैं।`
+      }
+    },
+    'spanish': {
+      'Conversational': {
+        short: `¡Amigos! Les voy a contar algo sobre ${topic} que les va a cambiar la vida! 😊 Es tan simple que se van a sorprender.`,
+        medium: `Oye, ¿están confundidos con ${topic}? ¡Hoy lo voy a aclarar todo! 🤗 La verdad es que yo también cometí este error antes. Pero cuando descubrí la verdad, todo se volvió claro. Vamos a entenderlo paso a paso.`,
+        long: `Hermanos, cuando hablo de ${topic} se me llena el corazón! 💝 He visto cómo la gente lucha con esto, igual que yo luchaba antes. Al principio pensaba que era súper complicado, pero la verdad es que lo hacemos más difícil de lo necesario. Hoy voy a compartir todos los secretos que aprendí después de años de trabajo duro. Primero - la base tiene que ser sólida. Segundo - la consistencia es lo más importante.`,
+        very_long: `¡Amigos, hoy voy a compartir el journey completo de ${topic}! 🌟 Es emocional y educativo a la vez. Les voy a contar cómo empecé, cómo cometí errores, cómo aprendí, y cómo ustedes también pueden tener éxito. Créanme, si yo pude, ustedes también pueden! Al principio era un completo principiante, no sabía nada. Pero poco a poco, practicando, aprendiendo de los errores, buscando guidance de expertos, logré dominar esto. Hoy les voy a enseñar todas las técnicas que realmente funcionan.`
+      },
+      'Professional': {
+        short: `${topic} presenta una ventaja estratégica crítica que los líderes de la industria aprovechan. 💼 Este enfoque basado en datos ofrece resultados medibles.`,
+        medium: `Nuestro análisis integral de ${topic} revela oportunidades significativas en el mercado. 📈 La investigación indica que el 85% de las organizaciones subutilizan este marco estratégico.`,
+        long: `Hoy realizamos un análisis profundo de ${topic} y su impacto en el rendimiento organizacional. 🎯 A través de investigación extensiva y colaboración con líderes de pensamiento de la industria, hemos identificado indicadores clave.`,
+        very_long: `Estamos desarrollando un marco estratégico integral para el dominio de ${topic} basado en 15+ años de investigación de la industria y consultoría ejecutiva. 🏆 Esta metodología abarca planificación estratégica, hojas de ruta de implementación y modelos de crecimiento sostenible.`
+      },
+      'Witty': {
+        short: `${topic} no es ciencia espacial, ¡pero todos lo tratamos como cirugía cerebral! 😂 Aquí está la verdad hilarantemente simple que todos pasan por alto.`,
+        medium: `Entonces ${topic} es básicamente como armar muebles de IKEA - ¡las instrucciones están ahí, pero todos pensamos que somos demasiado inteligentes para leerlas! 🤣`,
+        long: `¡Nuestra relación con ${topic} es... complicada! 😅 Es como ese ex que seguimos tratando de entender pero siempre terminamos más confundidos.`,
+        very_long: `¡Bienvenidos al show de comedia de ${topic}! 🎭 Este es el tema con el que todos tenemos una relación de amor-odio. Primero lo amamos, luego lo odiamos, luego tratamos de hacer que funcione de nuevo.`
+      },
+      'Inspirational': {
+        short: `¡${topic} es tu puerta de entrada a la transformación! ✨ Esta única perspectiva tiene el poder de cambiar completamente tu trayectoria.`,
+        medium: `Tu viaje con ${topic} comienza hoy, y estoy aquí para decirte: ¡eres capaz de cosas increíbles! 🌟 He visto a personas ordinarias lograr resultados extraordinarios cuando abrazan estos principios.`,
+        long: `¡Hoy marca el comienzo de tu transformación a través de ${topic}! 🚀 Creo en tu potencial porque he sido testigo del increíble poder de la determinación humana. Cada experto fue una vez un principiante que se negó a rendirse.`,
+        very_long: `¡Este es tu momento de transformación con ${topic}! 🌈 Comparto esto con profunda convicción porque he visto vidas cambiadas, sueños realizados y metas imposibles alcanzadas. Tu historia de éxito comienza aquí, hoy.`
+      },
+      'Storytelling': {
+        short: `Déjame contarte una historia sobre ${topic} que cambió todo... 📖 Fue un momento que cambió toda mi perspectiva.`,
+        medium: `Imagínate esto: Son las 2 AM, estoy mirando la pantalla de mi computadora, completamente frustrado con ${topic}. 😤 Nada funcionaba. Entonces pasó algo que cambió todo.`,
+        long: `Quiero llevarte de vuelta a un momento crucial en mi viaje con ${topic}. 🎬 Fue uno de esos días cuando todo parecía salir mal. Había probado cada estrategia, seguido cada consejo de expertos.`,
+        very_long: `Reúnanse, porque estoy a punto de compartir la historia completa de mi transformación con ${topic}: las luchas, los fracasos, los momentos de revelación y el triunfo final. 📚 Esta no es solo una guía práctica; es un viaje de resistencia humana.`
+      },
+      'Persuasive': {
+        short: `¡Aquí está por qué ${topic} es absolutamente crítico para tu éxito ahora mismo! ⚡ Los datos son innegables y la oportunidad es masiva.`,
+        medium: `¡Te voy a demostrar por qué ${topic} no es solo importante, es esencial para tu éxito futuro! 🔥 Las estadísticas son asombrosas: las personas que dominan esto ven resultados 5 veces mejores.`,
+        long: `¡Permíteme presentar el caso convincente de por qué ${topic} debería ser tu prioridad #1 ahora mismo! 💪 La evidencia es abrumadora: cada persona exitosa en este campo ha dominado estos principios.`,
+        very_long: `¡Estoy a punto de hacer el argumento más convincente que jamás hayas escuchado para dominar ${topic}! 🎯 La investigación es clara, los resultados están probados y la oportunidad es sin precedentes.`
+      }
+    },
+    'chinese': {
+      'Conversational': {
+        short: `朋友们！我要告诉你们关于${topic}的一件事，这会改变你们的生活！😊 简单得让你们惊讶。`,
+        medium: `嘿，对${topic}感到困惑吗？今天我来为大家澄清一切！🤗 说实话，我以前也犯过这个错误。但当我发现真相时，一切都变得清晰了。让我们一步步来理解。`,
+        long: `兄弟们，谈到${topic}我就激动！💝 我见过人们在这方面的挣扎，就像我以前一样。起初我以为这很复杂，但事实是我们把它弄得比必要的更难。今天我要分享我经过多年努力学到的所有秘密。第一 - 基础必须牢固。第二 - 坚持是最重要的。`,
+        very_long: `朋友们，今天我要分享${topic}的完整旅程！🌟 这既感人又有教育意义。我会告诉你们我是如何开始的，如何犯错误，如何学习，以及你们如何也能成功。相信我，如果我能做到，你们也能！起初我完全是个新手，什么都不知道。但慢慢地，通过练习，从错误中学习，寻求专家指导，我掌握了这个。今天我要教你们所有真正有效的技巧。`
+      },
+      'Professional': {
+        short: `${topic}为行业领导者提供了关键的战略优势。💼 这种数据驱动的方法能够提供可衡量的结果。`,
+        medium: `我们对${topic}的综合分析揭示了重要的市场机会。📈 研究表明，85%的组织未充分利用这一战略框架。`,
+        long: `今天我们对${topic}及其对组织绩效的影响进行深入分析。🎯 通过广泛的研究和与行业思想领袖的合作，我们确定了区分市场领导者和竞争对手的关键绩效指标。`,
+        very_long: `我们正在基于15年以上的行业研究和高管咨询，开发${topic}掌握的综合战略框架。🏆 这种方法论包括战略规划、实施路线图、绩效优化、风险管理、利益相关者协调和可持续增长模型。`
+      },
+      'Witty': {
+        short: `${topic}不是火箭科学，但我们都把它当作脑外科手术！😂 这里是大家都错过的搞笑简单真相。`,
+        medium: `所以${topic}基本上就像组装宜家家具 - 说明书就在那里，但我们都认为自己太聪明了不需要看！🤣`,
+        long: `我们与${topic}的关系...很复杂！😅 就像那个我们一直试图理解但总是更加困惑的前任。`,
+        very_long: `欢迎来到${topic}喜剧秀！🎭 这是我们都有爱恨关系的话题。先爱它，然后恨它，然后再试图让它工作。`
+      },
+      'Inspirational': {
+        short: `${topic}是你转变的门户！✨ 这个单一洞察有能力完全改变你的轨迹。`,
+        medium: `你与${topic}的旅程今天开始，我在这里告诉你 - 你有能力做出不可思议的事情！🌟 我见过普通人在接受这些原则时取得非凡成果。`,
+        long: `今天标志着你通过${topic}转变的开始！🚀 我相信你的潜力，因为我见证了人类决心的不可思议力量。每个专家都曾是拒绝放弃的初学者。`,
+        very_long: `这是你与${topic}转变的时刻！🌈 我怀着深深的信念分享这个，因为我见过生活改变，梦想实现，不可能的目标达成。你的成功故事从这里开始。`
+      },
+      'Storytelling': {
+        short: `让我告诉你一个关于${topic}改变一切的故事...📖 那是一个改变我整个视角的时刻。`,
+        medium: `想象一下：凌晨2点，我盯着电脑屏幕，对${topic}完全沮丧。😤 什么都不起作用。然后发生了改变一切的事情。`,
+        long: `我想带你回到我${topic}旅程中的关键时刻。🎬 那是一切似乎都出错的日子之一。我尝试了每种策略，遵循了每个专家的建议。`,
+        very_long: `聚集起来，因为我即将分享我${topic}转变的完整故事 - 挣扎、失败、突破时刻和最终胜利。📚 这不仅仅是操作指南；这是人类韧性的旅程。`
+      },
+      'Persuasive': {
+        short: `这就是为什么${topic}对你现在的成功绝对关键！⚡ 数据不可否认，机会巨大。`,
+        medium: `我将向你证明为什么${topic}不仅重要 - 它对你未来的成功至关重要！🔥 统计数据令人震惊：掌握这个的人看到5倍更好的结果。`,
+        long: `让我为你呈现为什么${topic}应该是你现在第一优先级的令人信服的案例！💪 证据压倒性 - 这个领域的每个成功人士都掌握了这些原则。`,
+        very_long: `我即将为掌握${topic}做出你听过的最有说服力的论证！🎯 研究清楚，结果已证明，机会前所未有。我们生活在一个独特的时刻。`
       }
     }
   };
-
-  // Get tone-specific content from templates
-  const langTemplates = toneTemplates[language];
-  if (langTemplates && langTemplates[tone] && langTemplates[tone][length]) {
-    return langTemplates[tone][length];
+  
+  // Get content for the specified language and tone
+  if (contentTemplates[language] && contentTemplates[language][tone] && contentTemplates[language][tone][length]) {
+    return contentTemplates[language][tone][length];
   }
+  
+  // Fallback to English content generation
+  return generateEnglishContent(topic, tone, length, targetWords);
+}
 
-  // Fallback to English with emotional content
+// Helper functions for content generation
+function getBaseContentForLanguage(language, scriptType, tone, topic) {
+  const baseTemplates = {
+    'hindi': `${topic} के बारे में`,
+    'spanish': `Sobre ${topic}`,
+    'chinese': `关于${topic}`,
+    'arabic': `حول ${topic}`,
+    'urdu': `${topic} کے بارے میں`,
+    'marathi': `${topic} बद्दल`
+  };
+  return baseTemplates[language] || `About ${topic}`;
+}
+
+// English content generation function with proper scaling
+function generateEnglishContent(topic, tone, length, targetWords) {
   const englishTones = {
     'Conversational': {
       short: `Hey! Let me tell you something about ${topic} that's going to blow your mind! 🤯 This is so simple yet powerful.`,
@@ -498,75 +621,129 @@ function generateToneBasedContent(language, topic, tone, length, targetWords) {
   return englishTones[tone]?.[length] || `${topic} is an important topic that deserves your attention. Let's explore it together.`;
 }
 
+// Function to expand content to meet target word count
+function expandContent(baseContent, topic, tone, language, targetWords) {
+  const currentWords = baseContent.split(' ').length;
+  const wordsNeeded = targetWords - currentWords;
+  
+  if (wordsNeeded <= 0) return baseContent;
+  
+  // Generate additional content based on tone and language
+  const expansions = {
+    'english': {
+      'Conversational': [
+        `Let me break this down for you step by step.`,
+        `Here's what I've learned from my experience with ${topic}.`,
+        `The key thing to remember about ${topic} is consistency and patience.`,
+        `I want to share some practical tips that actually work.`,
+        `This approach has helped thousands of people just like you.`
+      ],
+      'Professional': [
+        `Our research indicates significant opportunities in this area.`,
+        `Industry analysis reveals key performance indicators for success.`,
+        `Strategic implementation requires systematic methodology and clear metrics.`,
+        `Best practices demonstrate measurable improvements in outcomes.`,
+        `Data-driven approaches yield consistently superior results.`
+      ],
+      'Witty': [
+        `But seriously, let's talk about what actually works here.`,
+        `I know, I know - everyone says that, but hear me out.`,
+        `Plot twist: it's actually simpler than you think.`,
+        `Here's the part where I drop some knowledge bombs.`,
+        `Trust me, I've made all the mistakes so you don't have to.`
+      ],
+      'Inspirational': [
+        `You have everything within you to succeed at this.`,
+        `Every expert was once a beginner who refused to give up.`,
+        `Your journey with ${topic} is just beginning, and it's going to be amazing.`,
+        `Believe in yourself - you're capable of incredible things.`,
+        `This is your moment to transform and grow.`
+      ],
+      'Storytelling': [
+        `Let me tell you what happened next in my journey.`,
+        `The turning point came when I realized something important.`,
+        `This story gets even more interesting from here.`,
+        `What I discovered next completely changed my perspective.`,
+        `The lessons I learned from this experience were invaluable.`
+      ],
+      'Persuasive': [
+        `The evidence is overwhelming and the results speak for themselves.`,
+        `Here's why this matters more than you might think.`,
+        `The data clearly shows the impact of this approach.`,
+        `This isn't just theory - it's proven by real results.`,
+        `The opportunity cost of not acting is simply too high.`
+      ]
+    },
+    'hindi': {
+      'Conversational': [
+        `मैं आपको step by step बताता हूं कि कैसे करना है।`,
+        `${topic} के साथ मेरा experience share करता हूं।`,
+        `सबसे important बात है patience और consistency।`,
+        `ये practical tips हैं जो actually काम करती हैं।`,
+        `हजारों लोगों की इससे help हुई है।`
+      ],
+      'Professional': [
+        `हमारी research में significant opportunities दिखी हैं।`,
+        `Industry analysis से key performance indicators clear हैं।`,
+        `Strategic implementation के लिए systematic approach चाहिए।`,
+        `Best practices से measurable improvements होते हैं।`,
+        `Data-driven approach से consistently better results मिलते हैं।`
+      ]
+    }
+  };
+  
+  const langExpansions = expansions[language] || expansions['english'];
+  const toneExpansions = langExpansions[tone] || langExpansions['Conversational'];
+  
+  // Add expansions until we reach target word count
+  let expandedContent = baseContent;
+  let addedWords = 0;
+  
+  for (let i = 0; i < toneExpansions.length && addedWords < wordsNeeded; i++) {
+    const expansion = toneExpansions[i];
+    const expansionWords = expansion.split(' ').length;
+    
+    if (addedWords + expansionWords <= wordsNeeded + 10) { // Allow slight overflow
+      expandedContent += ' ' + expansion;
+      addedWords += expansionWords;
+    }
+  }
+  
+  return expandedContent;
+}
+
+// Content scaling functions for different durations
+function generateShortContent(baseContent, topic, language, targetWords) {
+  return generateContentByLanguageAndTone(language, topic, 'Conversational', 'short', targetWords);
+}
+
+function generateMediumContent(baseContent, topic, language, targetWords) {
+  return generateContentByLanguageAndTone(language, topic, 'Conversational', 'medium', targetWords);
+}
+
+function generateLongContent(baseContent, topic, language, targetWords) {
+  return generateContentByLanguageAndTone(language, topic, 'Conversational', 'long', targetWords);
+}
+
+function generateVeryLongContent(baseContent, topic, language, targetWords) {
+  return generateContentByLanguageAndTone(language, topic, 'Conversational', 'very_long', targetWords);
+}
+
 // Main content generation function with proper duration scaling
 function generateMainContent(scriptType, tone, topic, wordLimits, language) {
   const targetWords = wordLimits.target;
   
-  // Generate content based on actual target word count for proper duration scaling
-  const baseContent = getBaseContentForLanguage(language, scriptType, tone, topic);
-  
-  // Scale content based on target words - this ensures duration accuracy
+  // Determine content length based on target words and use proper tone
+  let contentLength;
   if (targetWords <= 30) {
-    // Very short content (15-30 seconds)
-    return generateShortContent(baseContent, topic, language, targetWords);
+    contentLength = 'short';
   } else if (targetWords <= 80) {
-    // Short content (30 seconds - 1 minute)
-    return generateMediumContent(baseContent, topic, language, targetWords);
+    contentLength = 'medium';
   } else if (targetWords <= 200) {
-    // Medium content (1-3 minutes)
-    return generateLongContent(baseContent, topic, language, targetWords);
+    contentLength = 'long';
   } else {
-    // Long detailed content (3+ minutes)
-    return generateVeryLongContent(baseContent, topic, language, targetWords);
+    contentLength = 'very_long';
   }
-}
-
-// Duration-based content generation functions
-function getBaseContentForLanguage(language, scriptType, tone, topic) {
-  const baseTemplates = {
-    'hindi': `${topic} के बारे में`,
-    'spanish': `Sobre ${topic}`,
-    'chinese': `关于${topic}`,
-    'arabic': `حول ${topic}`,
-    'urdu': `${topic} کے بارے میں`,
-    'marathi': `${topic} बद्दल`
-  };
-  return baseTemplates[language] || `About ${topic}`;
-}
-
-function generateShortContent(base, topic, language, targetWords) {
-  // Get tone from context - this will be passed properly
-  return generateToneBasedContent(language, topic, 'short', targetWords);
-}
-
-function generateMediumContent(base, topic, language, targetWords) {
-  const templates = {
-    'hindi': `${topic} के बारे में मुख्य बात यह है कि अधिकांश लोग इसे गलत समझते हैं। सबसे बड़ी गलती यह है कि वे जटिल तरीकों पर ध्यान देते हैं।`,
-    'spanish': `La clave sobre ${topic} es que la mayoría lo entiende mal. El error más grande es enfocarse en métodos complicados.`,
-    'chinese': `关于${topic}的关键是大多数人理解错了。最大的错误是专注于复杂的方法。`,
-    'arabic': `المفتاح حول ${topic} هو أن معظم الناس يفهمونه خطأ. الخطأ الأكبر هو التركيز على الطرق المعقدة.`,
-    'urdu': `${topic} کے بارے میں اصل بات یہ ہے کہ زیادہ تر لوگ اسے غلط سمجھتے ہیں۔ سب سے بڑی غلطی یہ ہے کہ وہ پیچیدہ طریقوں پر توجہ دیتے ہیں۔`,
-    'marathi': `${topic} बद्दल मुख्य गोष्ट ही आहे की बहुतेक लोक याला चुकीचे समजतात। सर्वात मोठी चूक म्हणजे जटिल पद्धतींवर लक्ष केंद्रित करणे।`
-  };
-  return templates[language] || `The key about ${topic} is that most people misunderstand it. The biggest mistake is focusing on complicated methods.`;
-}
-
-function generateLongContent(base, topic, language, targetWords) {
-  const templates = {
-    'hindi': `${topic} के बारे में विस्तार से बात करते हैं। अधिकांश लोग इसे गलत तरीके से समझते हैं क्योंकि वे बुनियादी सिद्धांतों को नजरअंदाज करते हैं। मुख्य समस्या यह है कि लोग जटिल रणनीतियों की तलाश करते हैं जबकि सफलता सरल और निरंतर अभ्यास में है। यहाँ तीन मुख्य बिंदु हैं जो आपको समझने चाहिए।`,
-    'spanish': `Hablemos en detalle sobre ${topic}. La mayoría de las personas lo entienden mal porque ignoran los principios básicos. El problema principal es que buscan estrategias complicadas cuando el éxito está en la práctica simple y constante. Aquí hay tres puntos clave que debes entender.`,
-    'chinese': `让我们详细谈论${topic}。大多数人理解错误是因为他们忽略了基本原则。主要问题是人们寻找复杂的策略，而成功在于简单和持续的实践。这里有三个关键点你需要理解。`,
-    'arabic': `دعنا نتحدث بالتفصيل عن ${topic}. معظم الناس يفهمونه خطأ لأنهم يتجاهلون المبادئ الأساسية. المشكلة الرئيسية أن الناس يبحثون عن استراتيجيات معقدة بينما النجاح في الممارسة البسيطة والمستمرة. إليك ثلاث نقاط رئيسية تحتاج لفهمها.`,
-    'urdu': `آئیے ${topic} کے بارے میں تفصیل سے بات کرتے ہیں۔ زیادہ تر لوگ اسے غلط سمجھتے ہیں کیونکہ وہ بنیادی اصولوں کو نظرانداز کرتے ہیں۔ اصل مسئلہ یہ ہے کہ لوگ پیچیدہ حکمت عملیوں کی تلاش کرتے ہیں جبکہ کامیابی سادہ اور مسلسل مشق میں ہے۔ یہاں تین اہم نکات ہیں جو آپ کو سمجھنے چاہیئے۔`,
-    'marathi': `चला ${topic} बद्दल तपशीलवार बोलूया. बहुतेक लोक याला चुकीचे समजतात कारण ते मूलभूत तत्त्वांकडे दुर्लक्ष करतात. मुख्य समस्या ही आहे की लोक जटिल रणनीतींचा शोध घेतात जेव्हा यश सोप्या आणि सतत सरावात आहे. येथे तीन मुख्य मुद्दे आहेत जे तुम्हाला समजले पाहिजेत.`
-  };
-  return templates[language] || `Let's talk in detail about ${topic}. Most people misunderstand it because they ignore basic principles. The main problem is people look for complicated strategies when success is in simple and consistent practice. Here are three key points you need to understand.`;
-}
-
-function generateVeryLongContent(base, topic, language, targetWords) {
-  const templates = {
-    'hindi': `${topic} पर एक व्यापक चर्चा करते हैं। यह विषय बहुत महत्वपूर्ण है क्योंकि अधिकांश लोग इसे गलत समझते हैं। पहली बात, बुनियादी सिद्धांत सबसे महत्वपूर्ण हैं। दूसरी बात, निरंतरता सफलता की कुंजी है। तीसरी बात, धैर्य और अभ्यास आवश्यक हैं। चौथी बात, गलतियों से सीखना जरूरी है। पांचवी बात, सही मार्गदर्शन लेना महत्वपूर्ण है। इन सभी बिंदुओं को समझकर आप ${topic} में महारत हासिल कर सकते हैं।`,
-    'spanish': `Tengamos una discusión completa sobre ${topic}. Este tema es muy importante porque la mayoría de las personas lo malentienden. Primero, los principios básicos son los más importantes. Segundo, la consistencia es clave para el éxito. Tercero, la paciencia y la práctica son esenciales. Cuarto, aprender de los errores es necesario. Quinto, obtener la orientación correcta es importante. Entendiendo todos estos puntos, puedes dominar ${topic}.`
-  };
-  return templates[language] || `Let's have a comprehensive discussion about ${topic}. This topic is very important because most people misunderstand it. First, basic principles are most important. Second, consistency is key to success. Third, patience and practice are essential. Fourth, learning from mistakes is necessary. Fifth, getting proper guidance is important. Understanding all these points, you can master ${topic}.`;
+  // Generate content in the selected language with proper tone and length
+  return generateContentByLanguageAndTone(language, topic, tone, contentLength, targetWords);
 }
